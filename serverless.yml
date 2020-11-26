@@ -9,13 +9,8 @@ provider:
   iamRoleStatements:
     - Effect: "Allow"
       Action:
-        - dynamodb:Scan
+        - dynamodb:Query
         - dynamodb:PutItem
-        # - dynamodb:GetItem
-        # - dynamodb:DescribeTable
-        # - dynamodb:Query
-        # - dynamodb:UpdateItem
-        # - dynamodb:DeleteItem
       Resource:
         - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_MESSAGES_TABLE}"
 
