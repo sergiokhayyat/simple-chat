@@ -1,0 +1,60 @@
+service: simple-chat
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: eu-west-1
+  environment:
+    DYNAMODB_MESSAGES_TABLE: simple-chat-messages
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - dynamodb:Scan
+        - dynamodb:PutItem
+        # - dynamodb:GetItem
+        # - dynamodb:DescribeTable
+        # - dynamodb:Query
+        # - dynamodb:UpdateItem
+        # - dynamodb:DeleteItem
+      Resource:
+        - "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_MESSAGES_TABLE}"
+
+functions:
+  get_messages:
+    handler: handler.get_messages
+    events:
+      - http:
+          path: /{chat_id}
+          method: get
+          request:
+            parameters:
+              paths:
+                chat_id: true
+  send_message:
+    handler: handler.send_message
+    events:
+      - http:
+          path: /{chat_id}
+          method: post
+          request:
+            parameters:
+              paths:
+                chat_id: true
+
+resuorces:
+  Resources:
+    DynamoChatsMessagesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.DYNAMODB_MESSAGES_TABLE}
+        AttributeDefinitions:
+          - AttributeName: chat_id
+            AttributeType: S
+          - AttributeName: ts
+            AttributeType: S
+        KeySchema:
+          - AttributeName: chat_id
+            KeyType: HASH
+          - AttributeName: ts
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
