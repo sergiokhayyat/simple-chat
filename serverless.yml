@@ -41,7 +41,7 @@ functions:
               paths:
                 chat_id: true
 
-resuorces:
+resources:
   Resources:
     DynamoChatsMessagesTable:
       Type: AWS::DynamoDB::Table
